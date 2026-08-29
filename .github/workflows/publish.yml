@@ -1,0 +1,41 @@
+name: リール公開
+
+# public リポジトリのため pull_request トリガーは付けない。
+# フォークからの PR が secrets に触れられてしまうのを防ぐため。
+on:
+  schedule:
+    - cron: '0 21 * * *'      # 06:00 JST
+    - cron: '0 3 * * *'       # 12:00 JST
+    - cron: '0 9 * * *'       # 18:00 JST
+  workflow_dispatch:
+
+concurrency:
+  group: ig-state
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: リールを公開する
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python publish/publish.py
+      - name: state.json を保存する
+        if: always()
+        run: |
+          if [[ -n "$(git status --porcelain state.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add state.json
+            git commit -m "chore: 投稿結果を記録"
+            git push
+          fi
