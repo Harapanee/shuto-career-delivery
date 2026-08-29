@@ -5,6 +5,10 @@ name: コンテナ事前作成
 on:
   schedule:
     - cron: '0 15 * * *'      # 00:00 JST(UTC 15:00)
+    # 0時の cron は世界中で混み合い、稀に丸ごと落ちる。6時公開の6分前に
+    # 保険をもう一発置く。prepare.py は prepared/published を読み飛ばすので
+    # 0時が正常に走っていれば何もせず終わる。
+    - cron: '50 20 * * *'     # 05:50 JST(0時が走らなかった場合の保険)
   workflow_dispatch:
 
 concurrency:
