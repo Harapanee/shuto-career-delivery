@@ -24,6 +24,11 @@ on:
     # 旧 '0 12 * * *'(21:00 JST)は初日2本目専用で、その枠は公開済み。
     # 以降は毎日何もせず終わるだけの空振りなので削除した。
   workflow_dispatch:
+    inputs:
+      key:
+        description: '取りこぼしを手動で公開するときだけ指定(例 003_20260830_0600)。空なら通常どおり時刻で選ぶ'
+        required: false
+        default: ''
 
 concurrency:
   group: ig-state
@@ -44,6 +49,7 @@ jobs:
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          PUBLISH_KEY: ${{ inputs.key }}
         run: python publish/publish.py
       - name: state.json を保存する
         if: always()
