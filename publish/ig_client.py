@@ -16,7 +16,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-BASE = "https://graph.facebook.com/v22.0"
+# Instagram API with Instagram Login のトークン(IGAA...)は graph.instagram.com でしか通らない。
+# graph.facebook.com に投げると「Cannot parse access token」で失敗する(2026-08-29 実測)。
+BASE = "https://graph.instagram.com/v22.0"
 
 
 class ContainerError(Exception):
